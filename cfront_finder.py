@@ -20,7 +20,7 @@ BOT_TOKEN = os.environ.get("BOT_TOKEN")
 CHAT_ID = os.environ.get("CHAT_ID")
 
 # CloudFront sirf 443 aur 80 support karta hai
-PORTS_TO_SCAN = [443,80]
+PORTS_TO_SCAN = [80]
 THREADS = 100
 
 GREEN = "\033[32m"
