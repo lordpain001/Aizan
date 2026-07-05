@@ -24,8 +24,8 @@ jobs:
         run: |
           python3 -c "
           import ipaddress
-          start = ipaddress.IPv4Address('56.120.1.1')
-          end = ipaddress.IPv4Address('56.127.255.255')
+          start = ipaddress.IPv4Address('56.191.1.1')
+          end = ipaddress.IPv4Address('56.198.255.255')
           with open('ips.txt', 'w') as f:
               curr = start
               while curr <= end:
@@ -40,5 +40,5 @@ jobs:
           CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
           echo "Starting CloudFront single scan round..."
-          python cfront_finder.py hosts.txt ips.txt
+          python cf_finder.py hosts.txt ips.txt
           echo "Scan finished successfully."
