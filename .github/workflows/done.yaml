@@ -1,0 +1,56 @@
+name: Run CloudFront and Cloudflare Scanner
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - '.github/workflows/**'
+        # Har 6 ghante mein automatic chalega
+  workflow_dispatch:            # Maual button se  krne ke liye
+
+permissions:
+  contents: write
+
+jobs:
+  run-scanner:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Dependencies
+        run: pip install requests
+
+      - name: Generate IP List
+        run: |
+          python3 -c "
+          import ipaddress
+          start = ipaddress.IPv4Address('4.0.0.0')
+          end = ipaddress.IPv4Address('4.255.255.255')
+          with open('ips.txt', 'w') as f:
+              curr = start
+              while curr <= end:
+                  f.write(f'{curr}\n')
+                  curr += 1
+          "
+
+      - name: Execute Stable Scanner Round
+        env:
+          BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          echo "Launching Python Multi-Phase Scanner..."
+          python scan.py ips.txt
+
+      - name: Commit and Save Database Logs
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "CDN State Database Auto-Update [Skip CI]"
+          file_pattern: 'live_database.json'
